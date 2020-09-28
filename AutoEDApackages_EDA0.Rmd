@@ -2,9 +2,12 @@
 title: "AutoEDA Packages for EDA0 (SFAN WQ I&M Data)"
 author: "Emalia Partlow (CCS Biology at UCSB): emaliapartlow107@gmail.com"
 date: "9/25/2020"
-output: html_document
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
 ---
 
+This document is meant to be run chunk by chunk. Do not try to Knit.
 
 All packages mentioned in “The Landscape of R Packages for Automated Exploratory Data Analysis” (Staniak and Biecek, 2019) except lubridate.
 
@@ -12,7 +15,6 @@ In "AutoEDA Packages in RStudio for EDA0" (Partlow, 2020) and Table 1, I compare
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "/Users/lisa.marrack/Desktop/NPS/SFAN-EDA")# Set wd.
 
 library(data.table)# (function used: as.data.table).
 library(dplyr)# Subset columns to make new df called sfanWQ (function used: select). sfanWQ long to wide format (function used: mutate). New df with only numeric variables (function used: select_if).
@@ -123,7 +125,7 @@ sfanWQwide2 <- as.data.table(sfanWQwide2)# Make sfanWQwide2 a data.table object.
 
 sfanWQwide2_num <- select_if(sfanWQwide2, is.numeric)# New data frame that is a subset of numeric variables from sfanWQwide2.
 sfanWQwide2_num$Depth <- sfanWQwide2_num$LQL <- sfanWQwide2_num$UQL <- sfanWQwide2_num$rn <- NULL# Remove columns that are not WQ parameter variables.
-WQwide2_num <- as.data.table(WQwide2_num)# Make WQwide2_num a data.table object.
+WQwide2_num <- as.data.table(sfanWQwide2_num)# Make WQwide2_num a data.table object.
 ```
 
 
