@@ -9,12 +9,15 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE)
 ```
 # About the EDA Workgroup
-This repository was created by the Exploratory Data Analysis Workgroup in the Inventory & Monitoring division.The focus of this group is to help anyone at IMD develop EDA skills regardless of where they are starting from. The products we share are unpolished and our ideas are in development.
+This repository was created by the Exploratory Data Analysis Workgroup in the Inventory & Monitoring division.The focus of this group is to help anyone at IMD develop EDA skills regardless of where they are starting from. The products we share are unpolished and our ideas are in development. This platform was created for all IMD data managers, -ologists, technicians, and whoever is interested in EDA to ask questions, look at examples from other networks, and share ideas. 
 
-The EDA workgroup will be sharing EDA projects they're working on in the Fall of 2020. While the code and the products are helpful, the thought process, rationale, and decisions will be the focus of this round of EDA workshops.  
+The EDA workgroup will be sharing EDA projects they're working on in the Fall/Winter of 2020. While the code and the products are helpful, the thought process, rationale, and decisions will be the focus of this round of EDA workshops.
+
 
 # IMD_EDA_resources Repository
-Use the repository to link to existing exploratory data analysis code created by people at I&M networks. This platform was created for all IMD data managers, -ologists, technicians, and whoever is interested in EDA to ask questions, look at examples from other networks, and share ideas.
+Use the repository to link to existing exploratory data analysis code created by people at I&M networks. In Fall/Winter of 2020, the EDA workgroup began a series of demonstrations and cookbooks on how to do EDA0-3. 
+
+EDA0 cookbook resources from the Sept. 23, 2020 meeting are now available here in GitHub.
 
 # Examples from Networks
 In March-June of 2020, participants in the EDA Workgroup shared early renditions of exploratory data analysis projects they were working on. Here are some of those projects and their authors. Please add links to a GitHub repository if you have one.
