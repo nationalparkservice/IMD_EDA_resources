@@ -8,19 +8,19 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
-# About the EDA Workgroup
+# About the EDA Workgroup Repository
 This repository was created by the Exploratory Data Analysis Workgroup in the Inventory & Monitoring division.The focus of this group is to help anyone at IMD develop EDA skills regardless of where they are starting from. The products we share are unpolished and our ideas are in development. This platform was created for all IMD data managers, -ologists, technicians, and whoever is interested in EDA to ask questions, look at examples from other networks, and share ideas. 
 
-The EDA workgroup will be sharing EDA projects they're working on in the Fall/Winter of 2020. While the code and the products are helpful, the thought process, rationale, and decisions will be the focus of this round of EDA workshops.
+The EDA workgroup will be sharing EDA projects they're working on in the Fall/Winter of 2020. While the code and the products are helpful, the thought process, rationale, and decisions are the focus of these EDA workshops.
 
 
 # IMD_EDA_resources Repository
-Use the repository to link to existing exploratory data analysis code created by people at I&M networks. In Fall/Winter of 2020, the EDA workgroup began a series of demonstrations and cookbooks on how to do EDA0-3. 
+Use the repository to link to existing exploratory data analysis code created by people at I&M networks.
 
-EDA0 cookbook resources from the Sept. 23, 2020 meeting are now available here in GitHub.
+Most things related to the EDA Workgroup are in Teams (e.g. meeting agendas, call notes). However, since the code that we use and reference is often shared it GitHub it makes more sense to reference it here. Use the repository to link to existing exploratory data analysis code created by people at I&M networks. This platform was created for all IMD data managers, -ologists, technicians, and whoever is interested in EDA to ask questions, look at examples from other networks, and share ideas.
 
 # Examples from Networks
-In March-June of 2020, participants in the EDA Workgroup shared early renditions of exploratory data analysis projects they were working on. Here are some of those projects and their authors. Please add links to a GitHub repository if you have one.
+In March through June of 2020, participants in the EDA Workgroup shared early renditions of exploratory data analysis projects they were working on. Here are some of those projects and their authors. Please add links to a GitHub repository if you have one.
 
 1. The Mojave Desert Network created a markdown document to automate quality control for their Integrated Uplands protocol. This repository is set to private, please request access from Sarah Wright (wright13) or Nicole Hupp (hupp2it). [MOJN Integrated Uplands QC Checks](https://github.com/nationalparkservice/mojn-iu-reporting)
 1. Understory vegetation EDA project by Jacob Gross, Lindsay Moore, Kathy Akamine (PACN) 
