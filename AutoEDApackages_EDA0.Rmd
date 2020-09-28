@@ -1,0 +1,331 @@
+---
+title: "AutoEDA Packages for EDA0 (SFAN WQ I&M Data)"
+author: "Emalia Partlow (CCS Biology at UCSB): emaliapartlow107@gmail.com"
+date: "9/25/2020"
+output: html_document
+---
+
+
+All packages mentioned in “The Landscape of R Packages for Automated Exploratory Data Analysis” (Staniak and Biecek, 2019) except lubridate.
+
+In "AutoEDA Packages in RStudio for EDA0" (Partlow, 2020) and Table 1, I compared the relative strengths of autoEDA packages for EDA0 and illustrated to what extent each package performs common EDA0 techniques.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/lisa.marrack/Desktop/NPS/SFAN-EDA")# Set wd.
+
+library(data.table)# (function used: as.data.table).
+library(dplyr)# Subset columns to make new df called sfanWQ (function used: select). sfanWQ long to wide format (function used: mutate). New df with only numeric variables (function used: select_if).
+library(tidyverse)# sfanWQ long to wide format (function used: pivot_wider).
+
+# 9 packages highlighted in "AutoEDA Packages in RStudio for EDA0" (Partlow, 2020) for having the most potential for the EDA0 of NPS I&M data:
+library(lubridate)
+library(dataMaid)
+library(explore)
+library(DataExplorer)
+library(SmartEDA)
+library(summarytools)
+library(inspectdf)# Install GitHub version (devtools::install_github("alastairrushworth/inspectdf")).
+library(funModeling)
+library(visdat)
+
+# Remaining autoEDA packages:
+library(dlookr)
+library(ExPanDaR)# Install GitHub version of ExPanDaR in order to get option to export report as notebook (devtools::install_github("joachim-gassen/ExPanDaR")).
+library(autoEDA)# Instal from GitHub (devtools::install_github("XanderHorn/autoEDA"))
+library(skimr)
+library(tableone)
+library(describer)
+library(prettyR)
+library(Hmisc)
+library(arsenal)
+library(xray)
+```
+
+
+Read in WQ dataset, manipulate:
+```{r}
+sfanWQoriginal <- read.csv("SFAN_WQ_PublicData_WY2006_2014.csv", header=TRUE)
+summary(sfanWQoriginal)
+str(sfanWQoriginal)
+head(sfanWQoriginal)
+sfanWQoriginal <- as.data.table(sfanWQoriginal)# Make sfanWQoriginal a data.table object.
+
+sfanWQ <- select(sfanWQoriginal, StationID, Visit.Start.Date, Depth.to.Activity, Local.Characteristic.Name, Result.Value.Text, Detection.Limit, Lower.Quantification.Limit, Upper.Quantification.Limit)# Create new data frame called sfanWQ with subseted columns for analysis. 
+sfanWQ<-as.data.table(sfanWQ)# Make sfanWQ a data.table object.
+
+sfanWQ2 <- sfanWQ# Copy sfanWQ.
+sfanWQ2$Result.Value.Text <- with(sfanWQ2,ifelse(Result.Value.Text %in% "*Non-detect", Lower.Quantification.Limit, ifelse(Result.Value.Text %in% "*Present >QL", Upper.Quantification.Limit, ifelse(Result.Value.Text %in% "*Present <QL", Lower.Quantification.Limit,Result.Value.Text))))# In column Result.Value.Text, replace text *Non-detect and *Present <QL with the value in column Lower.Quantification.Limit and replace text *Present >QL with the value in column Upper.Quantification.Limit.
+
+sfanWQwide <- sfanWQ2 %>% 
+  group_by(Local.Characteristic.Name)  %>%
+  mutate(rn = row_number()) %>% pivot_wider (names_from=Local.Characteristic.Name, values_from= Result.Value.Text)# sfanWQ2 switched from long to wide format with a new column for each parameter (Local.Characteristic.Name). mutate() makes data type = characters not "list", new column "rn" for row #.
+sfanWQwide <- as.data.table(sfanWQwide)# Make sfanWQwide a data.table object.
+sfanWQwide[ sfanWQwide == "*Not Reported" ] <- NA# Change all *Not Reported to NAs.
+
+sfanWQwide2 <- sfanWQwide# Copy sfanWQwide.
+
+#Change numeric parameters that are considered characters in sfanWQwide to correct data type. 
+sfanWQwide2$AirTemp_Glass<-as.numeric(sfanWQwide2$AirTemp_Glass)
+sfanWQwide2$AirTemp_Oakton<-as.numeric(sfanWQwide2$AirTemp_Oakton)
+sfanWQwide2$`Ammonia as N`<-as.numeric(sfanWQwide2$`Ammonia as N`)
+sfanWQwide2$`Ammonia as NH3`<-as.numeric(sfanWQwide2$`Ammonia as NH3`)
+sfanWQwide2$Cond_YSI85<-as.numeric(sfanWQwide2$`Ammonia as NH3`)
+sfanWQwide2$discharge<-as.numeric(sfanWQwide2$discharge)
+sfanWQwide2$`DO%_YSI85`<-as.numeric(sfanWQwide2$`DO%_YSI85`)
+sfanWQwide2$DO_YSI85<-as.numeric(sfanWQwide2$DO_YSI85)
+sfanWQwide2$E.coli_QuantiTray<-as.numeric(sfanWQwide2$E.coli_QuantiTray)
+sfanWQwide2$E.coli_SFANLab<-as.numeric(sfanWQwide2$E.coli_SFANLab)
+sfanWQwide2$`Estimated Flow`<-as.numeric(sfanWQwide2$`Estimated Flow`)
+sfanWQwide2$`Estimated velocity`<-as.numeric(sfanWQwide2$`Estimated velocity`)
+sfanWQwide2$FecalColiform_MultiTube<-as.numeric(sfanWQwide2$FecalColiform_MultiTube)
+sfanWQwide2$`Gage Height`<-as.numeric(sfanWQwide2$`Gage Height`)
+sfanWQwide2$H2OTemp_Oakton<-as.numeric(sfanWQwide2$H2OTemp_Oakton)
+sfanWQwide2$H2OTemp_YSI85<-as.numeric(sfanWQwide2$H2OTemp_YSI85)
+sfanWQwide2$`Last Precipitation`<-as.numeric(sfanWQwide2$`Last Precipitation`)
+sfanWQwide2$`Nitrate as N`<-as.numeric(sfanWQwide2$`Nitrate as N`)
+sfanWQwide2$`Nitrate as NO3`<-as.numeric(sfanWQwide2$`Nitrate as NO3`)
+sfanWQwide2$pH_Oakton<-as.numeric(sfanWQwide2$pH_Oakton)
+sfanWQwide2$pH_paper<-as.numeric(sfanWQwide2$pH_paper)
+sfanWQwide2$Salinity_YSI85<-as.numeric(sfanWQwide2$Salinity_YSI85)
+sfanWQwide2$SC_YSI85<-as.numeric(sfanWQwide2$SC_YSI85)
+sfanWQwide2$SSC<-as.numeric(sfanWQwide2$SSC)
+sfanWQwide2$`Stream Width`<-as.numeric(sfanWQwide2$`Stream Width`)
+sfanWQwide2$`Total Kjeldahl Nitrogen`<-as.numeric(sfanWQwide2$`Total Kjeldahl Nitrogen`)
+sfanWQwide2$TotalColiform_MPN<-as.numeric(sfanWQwide2$TotalColiform_MPN)
+sfanWQwide2$TotalColiform_QuantiTray<-as.numeric(sfanWQwide2$TotalColiform_QuantiTray)
+sfanWQwide2$TotalColiform_SFANLab<-as.numeric(sfanWQwide2$TotalColiform_SFANLab)
+sfanWQwide2$TSS<-as.numeric(sfanWQwide2$TSS)
+sfanWQwide2$Turbidity_Hach2100<-as.numeric(sfanWQwide2$Turbidity_Hach2100)
+sfanWQwide2$`Nitrite as N`<-as.numeric(sfanWQwide2$`Nitrite as N`)
+sfanWQwide2$pH_Sension1<-as.numeric(sfanWQwide2$pH_Sension1)
+sfanWQwide2$H20Temp_sension<-as.numeric(sfanWQwide2$H20Temp_sension)
+sfanWQwide2$`H2OTemp_YSI Pro Plus`<-as.numeric(sfanWQwide2$`H2OTemp_YSI Pro Plus`)
+sfanWQwide2$`Cond_YSI Pro Plus`<-as.numeric(sfanWQwide2$`Cond_YSI Pro Plus`)
+sfanWQwide2$`SC_YSI Pro Plus`<-as.numeric(sfanWQwide2$`SC_YSI Pro Plus`)
+sfanWQwide2$`pH_YSI Pro Plus`<-as.numeric(sfanWQwide2$`pH_YSI Pro Plus`)
+sfanWQwide2$`Salinity_YSI Pro Plus`<-as.numeric(sfanWQwide2$`Salinity_YSI Pro Plus`)
+sfanWQwide2$`DO%_YSI Pro Plus`<-as.numeric(sfanWQwide2$`DO%_YSI Pro Plus`)
+sfanWQwide2$`DO_YSI Pro Plus`<-as.numeric(sfanWQwide2$`DO_YSI Pro Plus`)
+sfanWQwide2$DO_YSI556<-as.numeric(sfanWQwide2$DO_YSI556)
+sfanWQwide2$`DO%_YSI556`<-as.numeric(sfanWQwide2$`DO%_YSI556`)
+sfanWQwide2$pH_YSI556<-as.numeric(sfanWQwide2$pH_YSI556)
+sfanWQwide2$Salinity_YSI556<-as.numeric(sfanWQwide2$Salinity_YSI556)
+sfanWQwide2$Cond_YSI556<-as.numeric(sfanWQwide2$Cond_YSI556)
+sfanWQwide2$SC_YSI556<-as.numeric(sfanWQwide2$SC_YSI556)
+sfanWQwide2$H2OTemp_YSI556<-as.numeric(sfanWQwide2$H2OTemp_YSI556)
+
+sfanWQwide2 <- sfanWQwide2 %>% rename(Date=Visit.Start.Date, Depth=Depth.to.Activity, LQL=Lower.Quantification.Limit, UQL=Upper.Quantification.Limit, Ammonia.as.N="Ammonia as N", Ammonia.as.NH3="Ammonia as NH3", DOpercent_YSI85="DO%_YSI85", Estimated.Flow="Estimated Flow", Estimated.velocity="Estimated velocity", Gage.Height="Gage Height", General.Notes="General Notes", Last.Precipitation="Last Precipitation", Nitrate.as.N="Nitrate as N", Nitrate.as.NO3="Nitrate as NO3", Stream.Width="Stream Width", Total.Kjeldahl.Nitrogen="Total Kjeldahl Nitrogen", Water.Appearance="Water Appearance", Nitrite.as.N="Nitrite as N", H2OTemp_YSI.Pro.Plus="H2OTemp_YSI Pro Plus", Cond_YSI.Pro.Plus="Cond_YSI Pro Plus", SC_YSI.Pro.Plus="SC_YSI Pro Plus", pH_YSI.Pro.Plus="pH_YSI Pro Plus", Salinity_YSI.Pro.Plus="Salinity_YSI Pro Plus", DOpercent_YSI.Pro.Plus="DO%_YSI Pro Plus", DO_YSI.Pro.Plus="DO_YSI Pro Plus", DOpercent_YSI556="DO%_YSI556")# Rename column headers to remove symbols and spaces. 
+
+sfanWQwide2$Lab_or_Visit_Notes <- NULL# Removes lab/visit notes column because variables with lengthy characters are not displayed well in reports.
+
+sfanWQwide2 <- as.data.table(sfanWQwide2)# Make sfanWQwide2 a data.table object.
+
+sfanWQwide2_num <- select_if(sfanWQwide2, is.numeric)# New data frame that is a subset of numeric variables from sfanWQwide2.
+sfanWQwide2_num$Depth <- sfanWQwide2_num$LQL <- sfanWQwide2_num$UQL <- sfanWQwide2_num$rn <- NULL# Remove columns that are not WQ parameter variables.
+WQwide2_num <- as.data.table(WQwide2_num)# Make WQwide2_num a data.table object.
+```
+
+
+9 packages highlighted in "AutoEDA Packages in RStudio for EDA0" for having the most potential for the EDA0 of NPS I&M data: lubridate, dataMaid, explore, DataExplorer, SmartEDA, summarytools, inspectdf, funModeling, visdat.
+
+
+lubridate:
+```{r}
+class(sfanWQwide2$Date)# Check class of dates column.
+head(sfanWQwide2$Date)# Look at how dates are formated (m/d/y).
+
+sfanWQwide2$Date <- mdy(sfanWQwide2$Date)# Change data type from character to date.
+class(sfanWQwide2$Date)# Double check class.
+head(sfanWQwide2$Date)# Check format.
+
+table(month(sfanWQwide2$Date, label=TRUE))# Frequency table with the number of times each month appears in the Date column. Can replace month() with year(), day(), wday(). Remove label=TRUE for year, month
+barplot(table(month(sfanWQwide2$Date, label=TRUE)))# Visualize frequency table as bar plot.
+
+#To look at interval between each row in Date column use:
+diff(sfanWQwide2$Date)#In days
+#or
+as.duration(int_diff(sfanWQwide2$Date))#In weeks
+```
+
+
+dataMaid:
+```{r}
+makeDataReport(sfanWQwide2, output="html", replace=TRUE, reportTitle="SFAN WQ EDA0")# Report includes: summary of full dataset, checks performed, summary table and visualization (bar plot or histogram) for each variable, which variables are "problematic" and why they were flagged (anomaly/outlier detection). To make report with only problematic variables include onlyProblematic=TRUE. If column headers include symbols (%) or spaces a report will not be generated because of an invalid filename error. It is dIfficult to read bar plots of categorical variables with more than a few character types (the text on the x axis overlaps). Missing value percentage can be inaccurate for columns with little data.
+
+# A report can not target specific variables, but the seperate check, summarize, and visualize functions can:
+
+allCheckFunctions()# Can change "Check" to "Summary" or "Visual". Gives list of specific functions that can be applied to each variable.
+
+dataMaid::summarize(sfanWQwide2$AirTemp_Glass)# Variable description, stats.
+visualize(sfanWQwide2$AirTemp_Glass)# Variable distribution.
+check(sfanWQwide2$AirTemp_Glass)# Details potential problem(s) with variable (includes outlier detection).
+```
+
+
+explore:
+```{r}
+explore(sfanWQwide2)# Shiny interactive explore pop up. Can specify target. 
+
+report(sfanWQwide2, output_file = "explore_report_sfanWQwide2", output_dir = "/Users/lisa.marrack/Desktop/NPS/SFAN-EDA")# Must specify output file and directory. Easier to visualize categorical variables than dataMaid because they are plotted along the y axis. Missing value percentage can be inaccurate for columns with little data.
+
+report(sfanWQwide2, target= StationID, output_file = "explore_report_sfanWQwide_stationID", output_dir = "/Users/lisa.marrack/Desktop/NPS/SFAN-EDA")# Report all variables with binary target (e.g. StationID). 
+```
+
+
+DataExplorer:
+```{r}
+create_report(sfanWQwide2, output_file = "DataExplorer_report_sfanWQwide2.html")# Report includes: dataset summary, missing data profile (missing value percentage can be inaccurate for columns with little data), data structure tree (difficult to read when it is used for a dataset with ~50+ variables), distributions (histogram or bar plot), QQPlots, correlation analysis (missing b/c insufficient complete rows), principal component analysis (missing b/c insuficient complete rows). 
+
+plot_boxplot(sfanWQwide2, by="StationID", nrow = 1L)# Boxplot of each variable broken down by StationID. Specify 1 Row.
+```
+
+
+SmartEDA:
+```{r}
+ExpReport(sfanWQwide2, Target = "AirTemp_Glass", op_file = "SmartEDA_report_sfanWQwide2")# Report includes: summary and visualization of each vairable (Numeric variables: QQplot, density plot, scatter plot. Categorical variables: bar plots). Use ggthemes package to customize ggplots. If column headers have symbols (%, -, etc.) or spaces, a report will not be generated because of an unexpected symbol error. Unlike the other reports, correlation analysis is not skipped because of "insufficient complete rows". A bivariate scatter plot is created for each possible variable pairing, which results in multiple blank plots. It takes the longest time, compared to the other 1 line report packages, for a report to be generated (because of the scatter plots).
+```
+
+
+summarytools:
+```{r}
+summarytools::freq(sfanWQwide2)# Frequency table (counts, missing values) for valid/total data in dataset. Can create simpler tables by setting certain columns to = FALSE.
+
+view(dfSummary(sfanWQwide2))# Print out data frame summary in viewer with basic stats, freqs, histogram, and missing data information.
+
+sfanWQst <- stby(data = sfanWQwide2, INDICES = sfanWQwide2$StationID, FUN = descr, stats = "common", transpose = TRUE)# Group variables by parameter. Display basic stats for each numeric variable in each group (e.g. StationID).
+view(sfanWQst)
+```
+
+
+inspectdf:
+```{r}
+# Add %>% show_plot() to each function to see graphic. Functions include options for comparing 2 datasets:
+
+inspect_na(sfanWQwide2) %>% show_plot()# Missing values for each variable. Compare between 2 datasets by adding df2 = WQwide2. Missing value percentage can be inaccurate for columns with little data.
+inspect_types(sfanWQwide2)# Number of each variable type.
+
+inspect_cat(sfanWQwide2)# Frequency of categorical levels in df.
+inspect_imb(sfanWQwide2)# Summary of most common level in each categorical variable.
+
+inspect_num(sfanWQwide2)  %>% show_plot(plot_layout = c(6,9))# Summary/stats for numeric variable levels. Plot shows histogram of each numeric variable. plot_layout specifies the number of rows and columns in the histogram document.
+inspect_cor(sfanWQwide2_num, method = "pearson") %>% show_plot()# Bivariate relationship/correlation coefficients for numeric variables. Can specify method.
+```
+
+
+funModeling:
+```{r}
+df_status(sfanWQwide2)# Summary of data frame (missing values, data type, unique values). Missing value percentage can be inaccurate for columns with little data.
+
+funModeling::freq(sfanWQwide2)# Frequency table and bar plot for each categorical variable.
+
+profiling_num(sfanWQwide2)# Table with multiple metrics for numeric variables.
+
+sfanWQwide3 <- sfanWQwide2_num# Copy sfanWQwide2_num.
+sfanWQwide3$Detection.Limit <- NULL# Delete Detection.Limit column in order to have a more accurate scale for the histograms (see below).
+plot_num(sfanWQwide3)# 1 plot with histograms for all numeric variables. Can specify bin #. There is 1 scale for all plotted variables, so it might be difficult to visualize them all if the measurements are very different in size. Can subset the data (see above) to get a clearer graphic.
+
+# correlation_table(data = sfanWQwide2, target = "AirTemp_Glass")# Correlation against targeted variable. Error because needs complete numeric column.
+var_rank_info(data = sfanWQwide2, target = "StationID")# "Importance variable ranking based on information theory".
+
+# cross_plot() and plotar() plot distribution of target vs predictor.
+plotar(sfanWQwide2, target = "StationID", plot_type = "boxplot")# Boxplot of each variable broken down by StationID.
+```
+
+
+visdat:
+```{r}
+vis_dat(sfanWQwide2, warn_large_data=FALSE)# Visualize data types and NAs. Set warn_large_data = FALSE for large datasets. 
+
+vis_guess(sfanWQwide2)# Visualize value type.
+
+vis_miss(sfanWQwide2, warn_large_data=FALSE)# Visualize missing data.
+
+vis_compare(sfanWQwide2, sfanWQwide)# Visualize difference between 2 datasets that have the same dimensions.
+
+vis_expect(sfanWQwide2, ~.x == 0)# Visualize whether a value is in the dataset (e.g. 0) or where a specified condition is met.
+
+vis_cor(sfanWQwide2_num)# Heatmap displaying correlations. Can specify what to do with NA values.
+```
+
+
+End of 9 packages detailed in "AutoEDA Packages in RStudio for EDA0" (Partlow, 2020)
+------------------------------------------------------------------------
+
+
+dlookr: 
+```{r}
+# eda_report(sfanWQwide2, output_format = "html", output_file = "dlookr_report_sfanWQwide2.html", output_dir = "/Users/lisa.marrack/Desktop/NPS/SFAN-EDA")# Can add target. Report includes: general summary of dataset, univariate analysis (normality test for numeric variables. Includes log and sqrt transformations), corelation between variables, target analysis. For large datasets Error in shapiro.test(x): sample size must be between 3 and 5000. Maybe change "collect_size =".
+
+diagnose_report(sfanWQwide2, output_format = "html", output_file = "dlookr_diagnose_sfanWQwide2.html", output_dir = "/Users/lisa.marrack/Desktop/NPS/SFAN-EDA")# Unlike eda_report, does not result in error when used on large dataset. Includes: variable summaries/descriptions and useful outlier diagnosis of each numeric variable. 
+```
+
+
+ExPanDaR:
+```{r}
+ExPanD(sfanWQwide2, df_name = "sfanWQwide2 ExPanDaR EDA Report", export_nb_option = TRUE)# Useful df_fef, var_def, abstract functions (options for attaching variable and dataset metadata). There is no summary of the overall dataset structure and missing values (although some variables show NAs in bar plots). export_nb_option set too TRUE to download as R notebook.
+```
+
+
+autoEDA:
+```{r}
+autoEDA(sfanWQwide2, removeMajorityMissing=FALSE, rotateLabels=TRUE, imputeMissing=FALSE, outputPath = "/Users/lisa.marrack/Desktop/NPS/SFAN-EDA")# Visualize numeric and categorical variables. Change graphics for continuous/discrete variables: plotContinuous= "boxplot", "qqplot", "density", "histogram". Change graphics for categorical variables: plotCategorical= "bar", "stackedBar", "groupedBar". Specify outputPath to print as PDF. Set removeMajorityMissing to FALSE to get graphics for variables with more than 1/2 observations missing. Set imputeMissing to FALSE so that the missing values are not imputed using the medium value. Add y= for bivariate analysis.
+
+dataOverview(sfanWQwide2)# Tabular EDA with data type, missing values, unique values, outliers, and stats.
+
+# Use predictivePower() for correlation analysis.
+```
+
+
+skimr:
+```{r}
+skim(sfanWQwide2)# Basic summary/description/stats of dataset and variables, basic/small histograms. Good for a quick glance into the data (similar to what is included in the beginning of data overview reports from other packages). 
+
+skim(sfanWQwide2, AirTemp_Glass, DOpercent_YSI85)# Targets and gives summaries for AirTemp_Glass and DOpercent_YSI85 parameters.
+```
+
+
+tableone:
+```{r}
+CreateTableOne(data = sfanWQwide2)# Summary of variables: frequency of non numeric, mean + SD of numeric.
+```
+
+
+describer:
+```{r}
+describer:: describe(sfanWQwide2)# Basic description of variables with some simple stats (column class, mean, SD). Can target variable.
+```
+
+
+prettyR:
+```{r}
+prettyR:: describe(sfanWQwide2)# Description of variables (mean, median, varience, SD, NAs, frequency of categorical variables). When specify a variable it prints out all values of that column. 
+```
+
+
+Hmisc:
+```{r}
+Hmisc:: describe(sfanWQwide2)# Basic description of dataset including missing values. Lists the lowest and highest values in each column (aids outlier detection).
+```
+
+
+arsenal:
+```{r}
+comparedf(sfanWQ, sfanWQwide2)# Compare different datasets. What variables do they share? For a more detailed description of the differences add summary().
+
+summary(freqlist(~StationID+Weather, data=sfanWQwide2), text=TRUE)# Frequency table for categorical variables. Can layer/group results so that it shows the frequency of how many times 2+ categorical variables appear together.
+
+summary(tableby(~StationID+AirTemp_Glass+DOpercent_YSI85, data=sfanWQwide2), text=TRUE)# Table of descriptive stats (mean, SD, range) and frequencies (including NAs) for targeted variable.
+
+# Use modelsum() for lin reg table.
+```
+
+
+xray:
+```{r}
+anomalies(sfanWQwide2)# Searches for anomalous columns. Can change anomaly and distinct value threshholds. 
+
+distributions(sfanWQwide2)# Graphic (histogram or bar chart) of each variable. Nice + quick visualizations.
+
+# Use timebased() to look at each variable with a time variable.
+```
