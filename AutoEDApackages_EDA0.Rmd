@@ -1,10 +1,10 @@
 ---
 title: "AutoEDA Packages for EDA0 (SFAN WQ I&M Data)"
 author: "Emalia Partlow (CCS Biology at UCSB): emaliapartlow107@gmail.com"
-date: "9/25/2020"
+date: "9/29/2020"
 output: html_notebook
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 This document is meant to be run chunk by chunk. Do not try to Knit.
@@ -16,9 +16,9 @@ In "AutoEDA Packages in RStudio for EDA0" (Partlow, 2020) and Table 1, I compare
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-library(data.table)# (function used: as.data.table).
 library(dplyr)# Subset columns to make new df called sfanWQ (function used: select). sfanWQ long to wide format (function used: mutate). New df with only numeric variables (function used: select_if).
 library(tidyverse)# sfanWQ long to wide format (function used: pivot_wider).
+library(readr)# Import data as tibble (function used: read_csv)
 
 # 9 packages highlighted in "AutoEDA Packages in RStudio for EDA0" (Partlow, 2020) for having the most potential for the EDA0 of NPS I&M data:
 library(lubridate)
@@ -47,85 +47,29 @@ library(xray)
 
 Read in WQ dataset, manipulate:
 ```{r}
-sfanWQoriginal <- read.csv("SFAN_WQ_PublicData_WY2006_2014.csv", header=TRUE)
+sfanWQoriginal <- read_csv("SFAN_WQ_PublicData_WY2006_2014.csv")# Import data as a tibble.
 summary(sfanWQoriginal)
 str(sfanWQoriginal)
 head(sfanWQoriginal)
-sfanWQoriginal <- as.data.table(sfanWQoriginal)# Make sfanWQoriginal a data.table object.
 
-sfanWQ <- select(sfanWQoriginal, StationID, Visit.Start.Date, Depth.to.Activity, Local.Characteristic.Name, Result.Value.Text, Detection.Limit, Lower.Quantification.Limit, Upper.Quantification.Limit)# Create new data frame called sfanWQ with subseted columns for analysis. 
-sfanWQ<-as.data.table(sfanWQ)# Make sfanWQ a data.table object.
+sfanWQ <- select(sfanWQoriginal, StationID, `Visit Start Date`, `Depth to Activity`, `Local Characteristic Name`, `Result Value/Text`, `Detection Limit`, `Lower Quantification Limit`, `Upper Quantification Limit`)# Create new data frame called sfanWQ with subseted columns for analysis. 
 
 sfanWQ2 <- sfanWQ# Copy sfanWQ.
-sfanWQ2$Result.Value.Text <- with(sfanWQ2,ifelse(Result.Value.Text %in% "*Non-detect", Lower.Quantification.Limit, ifelse(Result.Value.Text %in% "*Present >QL", Upper.Quantification.Limit, ifelse(Result.Value.Text %in% "*Present <QL", Lower.Quantification.Limit,Result.Value.Text))))# In column Result.Value.Text, replace text *Non-detect and *Present <QL with the value in column Lower.Quantification.Limit and replace text *Present >QL with the value in column Upper.Quantification.Limit.
+sfanWQ2$`Result Value/Text` <- with(sfanWQ2, ifelse(`Result Value/Text` %in% "*Non-detect", `Lower Quantification Limit`, ifelse(`Result Value/Text` %in% "*Present >QL", `Upper Quantification Limit`, ifelse(`Result Value/Text` %in% "*Present <QL", `Lower Quantification Limit`,`Result Value/Text`))))# In column `Result Value/Text', replace text *Non-detect and *Present <QL with the value in column 'Lower Quantification Limit' and replace text *Present >QL with the value in column `Upper Quantification Limit`.
 
 sfanWQwide <- sfanWQ2 %>% 
-  group_by(Local.Characteristic.Name)  %>%
-  mutate(rn = row_number()) %>% pivot_wider (names_from=Local.Characteristic.Name, values_from= Result.Value.Text)# sfanWQ2 switched from long to wide format with a new column for each parameter (Local.Characteristic.Name). mutate() makes data type = characters not "list", new column "rn" for row #.
-sfanWQwide <- as.data.table(sfanWQwide)# Make sfanWQwide a data.table object.
+  group_by(`Local Characteristic Name`)  %>%
+  mutate(rn = row_number()) %>% pivot_wider (names_from=`Local Characteristic Name`, values_from= `Result Value/Text`)# sfanWQ2 switched from long to wide format with a new column for each parameter (Local.Characteristic.Name). mutate() makes data type = characters not "list", new column "rn" for row #.
 sfanWQwide[ sfanWQwide == "*Not Reported" ] <- NA# Change all *Not Reported to NAs.
+sfanWQwide$Lab_or_Visit_Notes <- NULL# Removes lab/visit notes column because variables with lengthy characters are not displayed well in reports.
 
-sfanWQwide2 <- sfanWQwide# Copy sfanWQwide.
+sfanWQwide2 <- sfanWQwide %>% mutate(across(c(AirTemp_Glass, AirTemp_Oakton, `Ammonia as N`, `Ammonia as NH3`, Cond_YSI85, discharge, `DO%_YSI85`, DO_YSI85, E.coli_QuantiTray, E.coli_SFANLab, `Estimated Flow`, `Estimated velocity`, FecalColiform_MultiTube, `Gage Height`, H2OTemp_Oakton, H2OTemp_YSI85, `Last Precipitation`, `Nitrate as N`, `Nitrate as NO3`, pH_Oakton, pH_paper, Salinity_YSI85, SC_YSI85, SSC, `Stream Width`, `Total Kjeldahl Nitrogen`, TotalColiform_MPN, TotalColiform_QuantiTray, TotalColiform_SFANLab, TSS, Turbidity_Hach2100, `Nitrite as N`, pH_Sension1, H20Temp_sension, `H2OTemp_YSI Pro Plus`,`Cond_YSI Pro Plus`, `SC_YSI Pro Plus`, `pH_YSI Pro Plus`, `Salinity_YSI Pro Plus`, `DO%_YSI Pro Plus`, `DO_YSI Pro Plus`, DO_YSI556, `DO%_YSI556`, pH_YSI556, Salinity_YSI556, Cond_YSI556, SC_YSI556, H2OTemp_YSI556), as.numeric))# New data frame with data types corrected (from character in sfanWQwide to numeric in sfanWQwide2).
+str(sfanWQwide2)
 
-#Change numeric parameters that are considered characters in sfanWQwide to correct data type. 
-sfanWQwide2$AirTemp_Glass<-as.numeric(sfanWQwide2$AirTemp_Glass)
-sfanWQwide2$AirTemp_Oakton<-as.numeric(sfanWQwide2$AirTemp_Oakton)
-sfanWQwide2$`Ammonia as N`<-as.numeric(sfanWQwide2$`Ammonia as N`)
-sfanWQwide2$`Ammonia as NH3`<-as.numeric(sfanWQwide2$`Ammonia as NH3`)
-sfanWQwide2$Cond_YSI85<-as.numeric(sfanWQwide2$`Ammonia as NH3`)
-sfanWQwide2$discharge<-as.numeric(sfanWQwide2$discharge)
-sfanWQwide2$`DO%_YSI85`<-as.numeric(sfanWQwide2$`DO%_YSI85`)
-sfanWQwide2$DO_YSI85<-as.numeric(sfanWQwide2$DO_YSI85)
-sfanWQwide2$E.coli_QuantiTray<-as.numeric(sfanWQwide2$E.coli_QuantiTray)
-sfanWQwide2$E.coli_SFANLab<-as.numeric(sfanWQwide2$E.coli_SFANLab)
-sfanWQwide2$`Estimated Flow`<-as.numeric(sfanWQwide2$`Estimated Flow`)
-sfanWQwide2$`Estimated velocity`<-as.numeric(sfanWQwide2$`Estimated velocity`)
-sfanWQwide2$FecalColiform_MultiTube<-as.numeric(sfanWQwide2$FecalColiform_MultiTube)
-sfanWQwide2$`Gage Height`<-as.numeric(sfanWQwide2$`Gage Height`)
-sfanWQwide2$H2OTemp_Oakton<-as.numeric(sfanWQwide2$H2OTemp_Oakton)
-sfanWQwide2$H2OTemp_YSI85<-as.numeric(sfanWQwide2$H2OTemp_YSI85)
-sfanWQwide2$`Last Precipitation`<-as.numeric(sfanWQwide2$`Last Precipitation`)
-sfanWQwide2$`Nitrate as N`<-as.numeric(sfanWQwide2$`Nitrate as N`)
-sfanWQwide2$`Nitrate as NO3`<-as.numeric(sfanWQwide2$`Nitrate as NO3`)
-sfanWQwide2$pH_Oakton<-as.numeric(sfanWQwide2$pH_Oakton)
-sfanWQwide2$pH_paper<-as.numeric(sfanWQwide2$pH_paper)
-sfanWQwide2$Salinity_YSI85<-as.numeric(sfanWQwide2$Salinity_YSI85)
-sfanWQwide2$SC_YSI85<-as.numeric(sfanWQwide2$SC_YSI85)
-sfanWQwide2$SSC<-as.numeric(sfanWQwide2$SSC)
-sfanWQwide2$`Stream Width`<-as.numeric(sfanWQwide2$`Stream Width`)
-sfanWQwide2$`Total Kjeldahl Nitrogen`<-as.numeric(sfanWQwide2$`Total Kjeldahl Nitrogen`)
-sfanWQwide2$TotalColiform_MPN<-as.numeric(sfanWQwide2$TotalColiform_MPN)
-sfanWQwide2$TotalColiform_QuantiTray<-as.numeric(sfanWQwide2$TotalColiform_QuantiTray)
-sfanWQwide2$TotalColiform_SFANLab<-as.numeric(sfanWQwide2$TotalColiform_SFANLab)
-sfanWQwide2$TSS<-as.numeric(sfanWQwide2$TSS)
-sfanWQwide2$Turbidity_Hach2100<-as.numeric(sfanWQwide2$Turbidity_Hach2100)
-sfanWQwide2$`Nitrite as N`<-as.numeric(sfanWQwide2$`Nitrite as N`)
-sfanWQwide2$pH_Sension1<-as.numeric(sfanWQwide2$pH_Sension1)
-sfanWQwide2$H20Temp_sension<-as.numeric(sfanWQwide2$H20Temp_sension)
-sfanWQwide2$`H2OTemp_YSI Pro Plus`<-as.numeric(sfanWQwide2$`H2OTemp_YSI Pro Plus`)
-sfanWQwide2$`Cond_YSI Pro Plus`<-as.numeric(sfanWQwide2$`Cond_YSI Pro Plus`)
-sfanWQwide2$`SC_YSI Pro Plus`<-as.numeric(sfanWQwide2$`SC_YSI Pro Plus`)
-sfanWQwide2$`pH_YSI Pro Plus`<-as.numeric(sfanWQwide2$`pH_YSI Pro Plus`)
-sfanWQwide2$`Salinity_YSI Pro Plus`<-as.numeric(sfanWQwide2$`Salinity_YSI Pro Plus`)
-sfanWQwide2$`DO%_YSI Pro Plus`<-as.numeric(sfanWQwide2$`DO%_YSI Pro Plus`)
-sfanWQwide2$`DO_YSI Pro Plus`<-as.numeric(sfanWQwide2$`DO_YSI Pro Plus`)
-sfanWQwide2$DO_YSI556<-as.numeric(sfanWQwide2$DO_YSI556)
-sfanWQwide2$`DO%_YSI556`<-as.numeric(sfanWQwide2$`DO%_YSI556`)
-sfanWQwide2$pH_YSI556<-as.numeric(sfanWQwide2$pH_YSI556)
-sfanWQwide2$Salinity_YSI556<-as.numeric(sfanWQwide2$Salinity_YSI556)
-sfanWQwide2$Cond_YSI556<-as.numeric(sfanWQwide2$Cond_YSI556)
-sfanWQwide2$SC_YSI556<-as.numeric(sfanWQwide2$SC_YSI556)
-sfanWQwide2$H2OTemp_YSI556<-as.numeric(sfanWQwide2$H2OTemp_YSI556)
-
-sfanWQwide2 <- sfanWQwide2 %>% rename(Date=Visit.Start.Date, Depth=Depth.to.Activity, LQL=Lower.Quantification.Limit, UQL=Upper.Quantification.Limit, Ammonia.as.N="Ammonia as N", Ammonia.as.NH3="Ammonia as NH3", DOpercent_YSI85="DO%_YSI85", Estimated.Flow="Estimated Flow", Estimated.velocity="Estimated velocity", Gage.Height="Gage Height", General.Notes="General Notes", Last.Precipitation="Last Precipitation", Nitrate.as.N="Nitrate as N", Nitrate.as.NO3="Nitrate as NO3", Stream.Width="Stream Width", Total.Kjeldahl.Nitrogen="Total Kjeldahl Nitrogen", Water.Appearance="Water Appearance", Nitrite.as.N="Nitrite as N", H2OTemp_YSI.Pro.Plus="H2OTemp_YSI Pro Plus", Cond_YSI.Pro.Plus="Cond_YSI Pro Plus", SC_YSI.Pro.Plus="SC_YSI Pro Plus", pH_YSI.Pro.Plus="pH_YSI Pro Plus", Salinity_YSI.Pro.Plus="Salinity_YSI Pro Plus", DOpercent_YSI.Pro.Plus="DO%_YSI Pro Plus", DO_YSI.Pro.Plus="DO_YSI Pro Plus", DOpercent_YSI556="DO%_YSI556")# Rename column headers to remove symbols and spaces. 
-
-sfanWQwide2$Lab_or_Visit_Notes <- NULL# Removes lab/visit notes column because variables with lengthy characters are not displayed well in reports.
-
-sfanWQwide2 <- as.data.table(sfanWQwide2)# Make sfanWQwide2 a data.table object.
+sfanWQwide2 <- sfanWQwide2 %>% rename(Date="Visit Start Date", Depth="Depth to Activity", LQL="Lower Quantification Limit", UQL="Upper Quantification Limit", Ammonia.as.N="Ammonia as N", Ammonia.as.NH3="Ammonia as NH3", DOpercent_YSI85="DO%_YSI85", Estimated.Flow="Estimated Flow", Estimated.velocity="Estimated velocity", Gage.Height="Gage Height", General.Notes="General Notes", Last.Precipitation="Last Precipitation", Nitrate.as.N="Nitrate as N", Nitrate.as.NO3="Nitrate as NO3", Stream.Width="Stream Width", Total.Kjeldahl.Nitrogen="Total Kjeldahl Nitrogen", Water.Appearance="Water Appearance", Nitrite.as.N="Nitrite as N", H2OTemp_YSI.Pro.Plus="H2OTemp_YSI Pro Plus", Cond_YSI.Pro.Plus="Cond_YSI Pro Plus", SC_YSI.Pro.Plus="SC_YSI Pro Plus", pH_YSI.Pro.Plus="pH_YSI Pro Plus", Salinity_YSI.Pro.Plus="Salinity_YSI Pro Plus", DOpercent_YSI.Pro.Plus="DO%_YSI Pro Plus", DO_YSI.Pro.Plus="DO_YSI Pro Plus", DOpercent_YSI556="DO%_YSI556")# Rename column headers to remove symbols and spaces. 
 
 sfanWQwide2_num <- select_if(sfanWQwide2, is.numeric)# New data frame that is a subset of numeric variables from sfanWQwide2.
 sfanWQwide2_num$Depth <- sfanWQwide2_num$LQL <- sfanWQwide2_num$UQL <- sfanWQwide2_num$rn <- NULL# Remove columns that are not WQ parameter variables.
-WQwide2_num <- as.data.table(sfanWQwide2_num)# Make WQwide2_num a data.table object.
 ```
 
 
@@ -169,9 +113,9 @@ explore:
 ```{r}
 explore(sfanWQwide2)# Shiny interactive explore pop up. Can specify target. 
 
-report(sfanWQwide2, output_file = "explore_report_sfanWQwide2", output_dir = "/Users/lisa.marrack/Desktop/NPS/SFAN-EDA")# Must specify output file and directory. Easier to visualize categorical variables than dataMaid because they are plotted along the y axis. Missing value percentage can be inaccurate for columns with little data.
+report(sfanWQwide2, output_file = "explore_report_sfanWQwide2", output_dir = "./reports")# Must specify output file and directory. Easier to visualize categorical variables than dataMaid because they are plotted along the y axis. Missing value percentage can be inaccurate for columns with little data.
 
-report(sfanWQwide2, target= StationID, output_file = "explore_report_sfanWQwide_stationID", output_dir = "/Users/lisa.marrack/Desktop/NPS/SFAN-EDA")# Report all variables with binary target (e.g. StationID). 
+report(sfanWQwide2, target= StationID, output_file = "explore_report_sfanWQwide_stationID", output_dir = "./reports")# Report all variables with binary target (e.g. StationID). 
 ```
 
 
@@ -228,7 +172,6 @@ sfanWQwide3$Detection.Limit <- NULL# Delete Detection.Limit column in order to h
 plot_num(sfanWQwide3)# 1 plot with histograms for all numeric variables. Can specify bin #. There is 1 scale for all plotted variables, so it might be difficult to visualize them all if the measurements are very different in size. Can subset the data (see above) to get a clearer graphic.
 
 # correlation_table(data = sfanWQwide2, target = "AirTemp_Glass")# Correlation against targeted variable. Error because needs complete numeric column.
-var_rank_info(data = sfanWQwide2, target = "StationID")# "Importance variable ranking based on information theory".
 
 # cross_plot() and plotar() plot distribution of target vs predictor.
 plotar(sfanWQwide2, target = "StationID", plot_type = "boxplot")# Boxplot of each variable broken down by StationID.
@@ -257,9 +200,9 @@ End of 9 packages detailed in "AutoEDA Packages in RStudio for EDA0" (Partlow, 2
 
 dlookr: 
 ```{r}
-# eda_report(sfanWQwide2, output_format = "html", output_file = "dlookr_report_sfanWQwide2.html", output_dir = "/Users/lisa.marrack/Desktop/NPS/SFAN-EDA")# Can add target. Report includes: general summary of dataset, univariate analysis (normality test for numeric variables. Includes log and sqrt transformations), corelation between variables, target analysis. For large datasets Error in shapiro.test(x): sample size must be between 3 and 5000. Maybe change "collect_size =".
+# eda_report(sfanWQwide2, output_format = "html", output_file = "dlookr_report_sfanWQwide2.html", output_dir = "./reports")# Can add target. Report includes: general summary of dataset, univariate analysis (normality test for numeric variables. Includes log and sqrt transformations), corelation between variables, target analysis. For large datasets Error in shapiro.test(x): sample size must be between 3 and 5000. Maybe change "collect_size =".
 
-diagnose_report(sfanWQwide2, output_format = "html", output_file = "dlookr_diagnose_sfanWQwide2.html", output_dir = "/Users/lisa.marrack/Desktop/NPS/SFAN-EDA")# Unlike eda_report, does not result in error when used on large dataset. Includes: variable summaries/descriptions and useful outlier diagnosis of each numeric variable. 
+diagnose_report(sfanWQwide2, output_format = "html", output_file = "dlookr_diagnose_sfanWQwide2.html", output_dir = "./reports")# Unlike eda_report, does not result in error when used on large dataset. Includes: variable summaries/descriptions and useful outlier diagnosis of each numeric variable. 
 ```
 
 
@@ -271,7 +214,7 @@ ExPanD(sfanWQwide2, df_name = "sfanWQwide2 ExPanDaR EDA Report", export_nb_optio
 
 autoEDA:
 ```{r}
-autoEDA(sfanWQwide2, removeMajorityMissing=FALSE, rotateLabels=TRUE, imputeMissing=FALSE, outputPath = "/Users/lisa.marrack/Desktop/NPS/SFAN-EDA")# Visualize numeric and categorical variables. Change graphics for continuous/discrete variables: plotContinuous= "boxplot", "qqplot", "density", "histogram". Change graphics for categorical variables: plotCategorical= "bar", "stackedBar", "groupedBar". Specify outputPath to print as PDF. Set removeMajorityMissing to FALSE to get graphics for variables with more than 1/2 observations missing. Set imputeMissing to FALSE so that the missing values are not imputed using the medium value. Add y= for bivariate analysis.
+autoEDA(sfanWQwide2, removeMajorityMissing=FALSE, rotateLabels=TRUE, imputeMissing=FALSE, outputPath = "./reports")# Visualize numeric and categorical variables. Change graphics for continuous/discrete variables: plotContinuous= "boxplot", "qqplot", "density", "histogram". Change graphics for categorical variables: plotCategorical= "bar", "stackedBar", "groupedBar". Specify outputPath to print as PDF. Set removeMajorityMissing to FALSE to get graphics for variables with more than 1/2 observations missing. Set imputeMissing to FALSE so that the missing values are not imputed using the medium value. Add y= for bivariate analysis.
 
 dataOverview(sfanWQwide2)# Tabular EDA with data type, missing values, unique values, outliers, and stats.
 
