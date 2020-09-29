@@ -202,7 +202,7 @@ dlookr:
 ```{r}
 # eda_report(sfanWQwide2, output_format = "html", output_file = "dlookr_report_sfanWQwide2.html", output_dir = "./reports")# Can add target. Report includes: general summary of dataset, univariate analysis (normality test for numeric variables. Includes log and sqrt transformations), corelation between variables, target analysis. For large datasets Error in shapiro.test(x): sample size must be between 3 and 5000. Maybe change "collect_size =".
 
-diagnose_report(sfanWQwide2, output_format = "html", output_file = "dlookr_diagnose_sfanWQwide2.html", output_dir = "./reports")# Unlike eda_report, does not result in error when used on large dataset. Includes: variable summaries/descriptions and useful outlier diagnosis of each numeric variable. 
+diagnose_report(sfanWQwide2, output_format = "html", output_file = "dlookr_diagnose_sfanWQwide2.html", output_dir = "./")# Unlike eda_report, does not result in error when used on large dataset. Includes: variable summaries/descriptions and useful outlier diagnosis of each numeric variable. 
 ```
 
 
