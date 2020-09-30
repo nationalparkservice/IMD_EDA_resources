@@ -2,7 +2,11 @@
 .Rhistory
 .RData
 .Ruserdata
+Reports/
 AutoEDApackages_EDA0.nb.html
 AutoEDApackages_EDA0_files/
 dataMaid_sfanWQwide2.Rmd
 dataMaid_sfanWQwide2.html
+DataExplorer_*.html
+dlookr_*.html
+SmartEDA_*.html
