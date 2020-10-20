@@ -1,0 +1,43 @@
+---
+title: "AutoEDApackages_EDA1"
+author: "Nicole Hupp"
+date: "10/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+library(dplyr) # Subset columns to make new df called sfanWQ (function used: select). sfanWQ long to wide format (function used: mutate). New df with only numeric variables (function used: select_if).
+library(tidyverse) # sfanWQ long to wide format (function used: pivot_wider).
+library(readr) # Import data as tibble (function used: read_csv)
+
+# 9 packages highlighted in "AutoEDA Packages in RStudio for EDA0" (Partlow, 2020) for having the most potential for the EDA0 of NPS I&M data:
+
+library(lubridate)
+library(dataMaid)
+library(explore)
+library(DataExplorer)
+library(SmartEDA)
+library(summarytools)
+library(inspectdf) # Install GitHub version (devtools::install_github("alastairrushworth/inspectdf")).
+library(funModeling)
+library(visdat)
+
+# Remaining autoEDA packages:
+
+library(dlookr)
+library(ExPanDaR) # Install GitHub version of ExPanDaR in order to get option to export report as notebook (devtools::install_github("joachim-gassen/ExPanDaR")).
+library(autoEDA) # Instal from GitHub (devtools::install_github("XanderHorn/autoEDA"))
+library(skimr)
+library(tableone)
+library(describer)
+library(prettyR)
+library(Hmisc)
+library(arsenal)
+library(xray)
+```
+
+Read in MOJN IU dataset, manipulate:
+```{r}
