@@ -21,7 +21,13 @@ Vegetation data on shrubland plant communities; the shrubland community of inter
 
 The purpose of the data is to understand status and trends in upland vegetation.
 
-1. What is the geographical span of the dataset? Are there major divisions within that span (e.g., park units, lakes, watersheds, habitats)? What is the temporal span of the dataset? Is there fundamental seasonality in that span (e.g., sites visited once a month, every summer, etc.)? Is there any rotating panel design in the observation schedule? What potential stressors might affect spatial or temporal variation?  What patterns of variation (spatial or temporal) would be expected?  Changes in means, durations, extremes, spatial or temporal variance, flashiness, etc.
+1. What is the geographical span of the dataset? Are there major divisions within that span (e.g., park units, lakes, watersheds, habitats)? 
+
+1. What is the temporal span of the dataset? Is there fundamental seasonality in that span (e.g., sites visited once a month, every summer, etc.)? Is there any rotating panel design in the observation schedule? 
+
+1. What potential stressors might affect spatial or temporal variation?  What patterns of variation (spatial or temporal) would be expected?  Changes in means, durations, extremes, spatial or temporal variance, flashiness, etc.
+
+These data are collected in 4 different shrubland communities across six parks. The sample schedule has varied over the years. One one park has been visited twice, LAKE. The first sampling year was early winter, second visit was in spring (peak phenology for creosote). PARA and GRBA monitoring occured in summer (peak phenology for sagebrush).
 
 1. What are the potential ecological consequences of these variables?  What form? Degree days, highest temperature sustained for 5+ days, extremes, etc.  Not just mean or median. Were there environmental changes during the span of data collection that could influence results (changes in land use, wildfire, drought, etc.)
 
