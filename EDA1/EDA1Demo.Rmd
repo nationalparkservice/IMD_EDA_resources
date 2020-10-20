@@ -14,48 +14,77 @@ knitr::opts_chunk$set(echo = TRUE)
 This informs what visualizations and summaries might show informative patterns later in the EDA process.  It also helps identify the audience or audiences for the EDA and more formal analyses.
 
 1. What resources/types of ecological data are represented in the dataset?
-
-Vegetation data on shrubland plant communities; the shrubland community of interest is dependent on the park. JOTR =  Joshua trees; LAKE, MOJA = creosote; GRBA, PARA = sagebrush; MANZ = rabbitbrush (DEVA not included yet, will monitor blackbrush?). Data include several SOPs, all data collected reflects that of BLM's AIM protocol. Primary SOPs include LPI, basal gaps, canopy gaps, soil surface information, tree cover, and invasive species.
-
+  
+  Vegetation data on shrubland plant communities; the shrubland community of interest is dependent on the park. JOTR =  Joshua trees; LAKE, MOJA = creosote; GRBA, PARA = sagebrush; MANZ = rabbitbrush (DEVA not included yet, will monitor blackbrush?). Data include several SOPs, all data collected reflects that of BLM's AIM protocol. Primary SOPs include LPI, basal gaps, canopy gaps, soil surface information, tree cover, and invasive species.
 1. What does the protocol or study plan say is purpose of the data collection?
-
-The purpose of the data is to understand status and trends in upland vegetation.
+  1. The purpose of the data is to understand status and trends in upland vegetation.Specifically, the protocol narrative states: 
 
 1. What is the geographical span of the dataset? Are there major divisions within that span (e.g., park units, lakes, watersheds, habitats)? 
+  1.  These data are collected in 4 different shrubland communities across six parks. Four of the parks are Mojave Desert (LAKE, MOJA, JOTR, MANZ) and two are Great Basin (GRBA, PARA). 
 
 1. What is the temporal span of the dataset? Is there fundamental seasonality in that span (e.g., sites visited once a month, every summer, etc.)? Is there any rotating panel design in the observation schedule? 
-
+a.  In the initial application of the protocol (2014-2016), the protocol was not implemented during peak phenology; field work was done in winter/early spring in the Mojave. From 2017-2020, the protocol was implemented during peak phenology to capture invasive species data and for other ecological reasons. The sample schedule has varied over the years, and only one one park has been visited twice, LAKE. The first sampling year was early winter, second visit was in spring (peak phenology for creosote). PARA and GRBA monitoring occured in summer (peak phenology for sagebrush).
+ 
 1. What potential stressors might affect spatial or temporal variation?  What patterns of variation (spatial or temporal) would be expected?  Changes in means, durations, extremes, spatial or temporal variance, flashiness, etc.
 
-These data are collected in 4 different shrubland communities across six parks. The sample schedule has varied over the years. One one park has been visited twice, LAKE. The first sampling year was early winter, second visit was in spring (peak phenology for creosote). PARA and GRBA monitoring occured in summer (peak phenology for sagebrush).
+Rainfall and temperature differences should be expected between the two LAKE monitoring seasons. We are not looking at temporal or spatial variaion over time since we do not have repeat visits for these data.However, within sample seasons, we also expect to find temporal variation depending on the park. We expect that in the early part of the sampling season vegetation is young and hard to identify (e.g. we'll see more "annual grass" early and more "red brome" later once it can be ID'd). We may see changes in canopy cover through field seasons as grasses, herbaceous plants, and shrub leaves grow 
 
 1. What are the potential ecological consequences of these variables?  What form? Degree days, highest temperature sustained for 5+ days, extremes, etc.  Not just mean or median. Were there environmental changes during the span of data collection that could influence results (changes in land use, wildfire, drought, etc.)
 
+It is debatable if these data across parks should be compared at all since they are not in the same plant communities, or the same desert for that matter.
+
 1. Are there additional datasets that could provide covariates for later stages of EDA?
+
+Temperature and precip, potentially nitrogen deposition data for JOTR and SoCal parks. Grazing information in GRBA, PARA, LAKE, and MOJA.
 
 ### Management considerations
 1. Are there defined thresholds to trigger management tied to the dataset?
-JOTR and PARA are concerned with pinyon encroachment, though no threshold has been established (these parks are not fully implemented).
+
+GRBA and PARA are concerned with pinyon encroachment, though no threshold has been established (these parks are not fully implemented). JOTR conversations are ongoing, but so far no threshold has been determined. Grazing is of interest in all parks, but again, no thresholds have been determined.
 
 ## EDA0 
 
 ### Interview with a Dataset: Descriptive Metadata
 
 1. Based on data certification/QC, is this a reliable dataset? Garbage in -> garbage out. Consider precision/accuracy, consistency over time, etc.
+
+Yes, these data went through a thorough qc process, have been accepted, and are published on IRMA.
+
 1. What is the resource represented in the dataset?
+
+Shrubland plant communities.
+
 1. What are the primary goals of the data collection?
+
+To track changes in vegetation and soils
+
 
 ### Interview with a Dataset: Structural, Supporting, and Response Variables
 
 1. What constitutes an “observation” for this dataset? By this definition, how many observations are in the dataset?
+
+  An "observation" takes on different forms for a given SOP. For LPI, and observation is a layer type per pin drop. For basal gaps and conopy gaps it is a start point and end point along a 50 m line. For invasive plants it is presence/absence, phenology type, and disturbance type per quadrat on a 50 m line.
+
 1. What are the structural variables represented in the dataset (i.e., information about how/where/when data were collected)? Unlike supporting variables, such as comments, without structural variable data the records cannot be parsed. What types of data are these structural variables (e.g., factors, boolean,continuous integers, etc.) and what is their expected range?
+
+Plot code, date, transect number, 
+
 1. What are the response variables recorded in the dataset?
+
+Stated in the observation question above.
+
 1. What are the supporting variables recorded in the dataset (e.g., comments, notes, accuracy assessments)?
+
+Comments, notes, recorder ID, observer ID, weather, wind, sky cover
+
 
 ### Data Summary & Visualization
 EDA0 begins with summary statistics. Most of this can be done in just a few lines of code with automated EDA packages in R.
 
 1. Graph the patterns in the structural variables (e.g., dates, sites): are observations evenly spaced within/between the structural variables and if not, does the pattern line up with the expectations?
+
+
+
 1. Categorical response variables: generate a barchart for each variable
 1. Numerical response variables: generate descriptive statistics such as boxplots, kernel distributions, 5-number summaries and/or histograms for each variable
 1. How many missing values are there? Does this bring up questions or concerns about the dataset?
