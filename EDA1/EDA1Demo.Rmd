@@ -15,7 +15,11 @@ This informs what visualizations and summaries might show informative patterns l
 
 1. What resources/types of ecological data are represented in the dataset?
 
+Vegetation data on shrubland plant communities; the shrubland community of interest is dependent on the park. JOTR =  Joshua trees; LAKE, MOJA = creosote; GRBA, PARA = sagebrush; MANZ = rabbitbrush (DEVA not included yet, will monitor blackbrush?). Data include several SOPs, all data collected reflects that of BLM's AIM protocol. Primary SOPs include LPI, basal gaps, canopy gaps, soil surface information, tree cover, and invasive species.
+
 1. What does the protocol or study plan say is purpose of the data collection?
+
+The purpose of the data is to understand status and trends in upland vegetation.
 
 1. What is the geographical span of the dataset? Are there major divisions within that span (e.g., park units, lakes, watersheds, habitats)? What is the temporal span of the dataset? Is there fundamental seasonality in that span (e.g., sites visited once a month, every summer, etc.)? Is there any rotating panel design in the observation schedule? What potential stressors might affect spatial or temporal variation?  What patterns of variation (spatial or temporal) would be expected?  Changes in means, durations, extremes, spatial or temporal variance, flashiness, etc.
 
@@ -25,7 +29,7 @@ This informs what visualizations and summaries might show informative patterns l
 
 ### Management considerations
 1. Are there defined thresholds to trigger management tied to the dataset?
-
+JOTR and PARA are concerned with pinyon encroachment, though no threshold has been established (these parks are not fully implemented).
 
 ## EDA0 
 
