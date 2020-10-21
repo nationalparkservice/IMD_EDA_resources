@@ -30,7 +30,7 @@ This informs what visualizations and summaries might show informative patterns l
  
 1. What potential stressors might affect spatial or temporal variation?  What patterns of variation (spatial or temporal) would be expected?  Changes in means, durations, extremes, spatial or temporal variance, flashiness, etc.
 
-   * Rainfall and temperature differences should be expected between the two LAKE monitoring seasons. We are not looking at temporal or spatial variaion over time since we do not have repeat visits for these data.However, within sample seasons, we also expect to find temporal variation depending on the park. We expect that in the early part of the sampling season vegetation is young and hard to identify (e.g. we'll see more "annual grass" early and more "red brome" later once it can be ID'd). We may see changes in canopy cover through field seasons as grasses, herbaceous plants, and shrub leaves grow 
+   * Rainfall and temperature differences should be expected between the two LAKE monitoring seasons. We are not looking at temporal or spatial variaion over time since we do not have repeat visits for these data. However, within sample seasons, we also expect to find temporal variation depending on the park. We expect that in the early part of the sampling season vegetation is young and hard to identify (e.g. we'll see more "annual grass" early and more "red brome" later once it can be ID'd). We may see changes in canopy cover through field seasons as grasses, herbaceous plants, and shrub leaves grow 
 
 1. What are the potential ecological consequences of these variables?  What form? Degree days, highest temperature sustained for 5+ days, extremes, etc.  Not just mean or median. Were there environmental changes during the span of data collection that could influence results (changes in land use, wildfire, drought, etc.)
 
@@ -65,11 +65,11 @@ This informs what visualizations and summaries might show informative patterns l
 
 1. What constitutes an “observation” for this dataset? By this definition, how many observations are in the dataset?
 
-   * An "observation" takes on different forms for a given SOP. For LPI, and observation is a layer type per pin drop. For basal gaps and conopy gaps it is a start point and end point along a 50 m line. For invasive plants it is presence/absence, phenology type, and disturbance type per quadrat on a 50 m line.
+   * An "observation" takes on different forms for a given SOP. For LPI, an observation is a layer type per pin drop. For basal gaps and canopy gaps it is a start point and end point along a 50 m line. For invasive plants it is presence/absence, phenology type, and disturbance type per quadrat on a 50 m line.
 
 1. What are the structural variables represented in the dataset (i.e., information about how/where/when data were collected)? Unlike supporting variables, such as comments, without structural variable data the records cannot be parsed. What types of data are these structural variables (e.g., factors, boolean,continuous integers, etc.) and what is their expected range?
 
-   * Plot code, date, transect number, 
+   * Plot code, date, transect number
 
 1. What are the response variables recorded in the dataset?
 
