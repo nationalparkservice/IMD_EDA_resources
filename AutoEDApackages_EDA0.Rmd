@@ -1,7 +1,7 @@
 ---
 title: "AutoEDA Packages for EDA0 (SFAN WQ I&M Data)"
 author: "Emalia Partlow (CCS Biology at UCSB): emaliapartlow107@gmail.com"
-date: "9/29/2020"
+date: "10/29/2020"
 output: html_notebook
 editor_options: 
   chunk_output_type: console
@@ -11,7 +11,7 @@ This document is meant to be run chunk by chunk. Do not try to Knit.
 
 All packages mentioned in “The Landscape of R Packages for Automated Exploratory Data Analysis” (Staniak and Biecek, 2019) except lubridate.
 
-In "AutoEDA Packages in RStudio for EDA0" (Partlow, 2020) and Table 1, I compared the relative strengths of autoEDA packages for EDA0 and illustrated to what extent each package performs common EDA0 techniques.
+In "AutoEDA Packages in R for EDA0" (Partlow, 2020) and Table 1, I compared the relative strengths of autoEDA packages for EDA0 and illustrated to what extent each package performs common EDA0 techniques.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -20,7 +20,7 @@ library(dplyr) # Subset columns to make new df called sfanWQ (function used: sel
 library(tidyverse) # sfanWQ long to wide format (function used: pivot_wider).
 library(readr) # Import data as tibble (function used: read_csv)
 
-# 9 packages highlighted in "AutoEDA Packages in RStudio for EDA0" (Partlow, 2020) for having the most potential for the EDA0 of NPS I&M data:
+# 10 packages highlighted in "AutoEDA Packages in R for EDA0" (Partlow, 2020) for having the most potential for the EDA0 of NPS I&M data:
 library(lubridate)
 library(dataMaid)
 library(explore)
@@ -30,6 +30,14 @@ library(summarytools)
 library(inspectdf) # Install GitHub version (devtools::install_github("alastairrushworth/inspectdf")).
 library(funModeling)
 library(visdat)
+
+library(ggplot2) # Rasters with ggplot2 needs:
+library(plyr)
+library(reshape2)
+library(data.table)
+library(RColorBrewer)
+library(gridExtra)
+
 
 # Remaining autoEDA packages:
 library(dlookr)
@@ -59,22 +67,22 @@ sfanWQ2$`Result Value/Text` <- with(sfanWQ2, ifelse(`Result Value/Text` %in% "*N
 
 sfanWQwide <- sfanWQ2 %>%
   group_by(`Local Characteristic Name`) %>%
-  mutate(rn = row_number()) %>%
+  dplyr::mutate(rn = row_number()) %>%
   pivot_wider(names_from = `Local Characteristic Name`, values_from = `Result Value/Text`) # sfanWQ2 switched from long to wide format with a new column for each parameter (Local.Characteristic.Name). mutate() makes data type = characters not "list", new column "rn" for row #.
 sfanWQwide[sfanWQwide == "*Not Reported"] <- NA # Change all *Not Reported to NAs.
 sfanWQwide$Lab_or_Visit_Notes <- NULL # Removes lab/visit notes column because variables with lengthy characters are not displayed well in reports.
 
-sfanWQwide2 <- sfanWQwide %>% mutate(across(c(AirTemp_Glass, AirTemp_Oakton, `Ammonia as N`, `Ammonia as NH3`, Cond_YSI85, discharge, `DO%_YSI85`, DO_YSI85, E.coli_QuantiTray, E.coli_SFANLab, `Estimated Flow`, `Estimated velocity`, FecalColiform_MultiTube, `Gage Height`, H2OTemp_Oakton, H2OTemp_YSI85, `Last Precipitation`, `Nitrate as N`, `Nitrate as NO3`, pH_Oakton, pH_paper, Salinity_YSI85, SC_YSI85, SSC, `Stream Width`, `Total Kjeldahl Nitrogen`, TotalColiform_MPN, TotalColiform_QuantiTray, TotalColiform_SFANLab, TSS, Turbidity_Hach2100, `Nitrite as N`, pH_Sension1, H20Temp_sension, `H2OTemp_YSI Pro Plus`, `Cond_YSI Pro Plus`, `SC_YSI Pro Plus`, `pH_YSI Pro Plus`, `Salinity_YSI Pro Plus`, `DO%_YSI Pro Plus`, `DO_YSI Pro Plus`, DO_YSI556, `DO%_YSI556`, pH_YSI556, Salinity_YSI556, Cond_YSI556, SC_YSI556, H2OTemp_YSI556), as.numeric)) # New data frame with data types corrected (from character in sfanWQwide to numeric in sfanWQwide2).
+sfanWQwide2 <- sfanWQwide %>% dplyr::mutate(across(c(AirTemp_Glass, AirTemp_Oakton, `Ammonia as N`, `Ammonia as NH3`, Cond_YSI85, discharge, `DO%_YSI85`, DO_YSI85, E.coli_QuantiTray, E.coli_SFANLab, `Estimated Flow`, `Estimated velocity`, FecalColiform_MultiTube, `Gage Height`, H2OTemp_Oakton, H2OTemp_YSI85, `Last Precipitation`, `Nitrate as N`, `Nitrate as NO3`, pH_Oakton, pH_paper, Salinity_YSI85, SC_YSI85, SSC, `Stream Width`, `Total Kjeldahl Nitrogen`, TotalColiform_MPN, TotalColiform_QuantiTray, TotalColiform_SFANLab, TSS, Turbidity_Hach2100, `Nitrite as N`, pH_Sension1, H20Temp_sension, `H2OTemp_YSI Pro Plus`, `Cond_YSI Pro Plus`, `SC_YSI Pro Plus`, `pH_YSI Pro Plus`, `Salinity_YSI Pro Plus`, `DO%_YSI Pro Plus`, `DO_YSI Pro Plus`, DO_YSI556, `DO%_YSI556`, pH_YSI556, Salinity_YSI556, Cond_YSI556, SC_YSI556, H2OTemp_YSI556), as.numeric)) # New data frame with data types corrected (from character in sfanWQwide to numeric in sfanWQwide2).
 str(sfanWQwide2)
 
-sfanWQwide2 <- sfanWQwide2 %>% rename(Date = "Visit Start Date", Depth = "Depth to Activity", LQL = "Lower Quantification Limit", UQL = "Upper Quantification Limit", Ammonia.as.N = "Ammonia as N", Ammonia.as.NH3 = "Ammonia as NH3", DOpercent_YSI85 = "DO%_YSI85", Estimated.Flow = "Estimated Flow", Estimated.velocity = "Estimated velocity", Gage.Height = "Gage Height", General.Notes = "General Notes", Last.Precipitation = "Last Precipitation", Nitrate.as.N = "Nitrate as N", Nitrate.as.NO3 = "Nitrate as NO3", Stream.Width = "Stream Width", Total.Kjeldahl.Nitrogen = "Total Kjeldahl Nitrogen", Water.Appearance = "Water Appearance", Nitrite.as.N = "Nitrite as N", H2OTemp_YSI.Pro.Plus = "H2OTemp_YSI Pro Plus", Cond_YSI.Pro.Plus = "Cond_YSI Pro Plus", SC_YSI.Pro.Plus = "SC_YSI Pro Plus", pH_YSI.Pro.Plus = "pH_YSI Pro Plus", Salinity_YSI.Pro.Plus = "Salinity_YSI Pro Plus", DOpercent_YSI.Pro.Plus = "DO%_YSI Pro Plus", DO_YSI.Pro.Plus = "DO_YSI Pro Plus", DOpercent_YSI556 = "DO%_YSI556") # Rename column headers to remove symbols and spaces.
+sfanWQwide2 <- sfanWQwide2 %>% dplyr::rename(Date = "Visit Start Date", Depth = "Depth to Activity", LQL = "Lower Quantification Limit", UQL = "Upper Quantification Limit", Ammonia.as.N = "Ammonia as N", Ammonia.as.NH3 = "Ammonia as NH3", DOpercent_YSI85 = "DO%_YSI85", Estimated.Flow = "Estimated Flow", Estimated.velocity = "Estimated velocity", Gage.Height = "Gage Height", General.Notes = "General Notes", Last.Precipitation = "Last Precipitation", Nitrate.as.N = "Nitrate as N", Nitrate.as.NO3 = "Nitrate as NO3", Stream.Width = "Stream Width", Total.Kjeldahl.Nitrogen = "Total Kjeldahl Nitrogen", Water.Appearance = "Water Appearance", Nitrite.as.N = "Nitrite as N", H2OTemp_YSI.Pro.Plus = "H2OTemp_YSI Pro Plus", Cond_YSI.Pro.Plus = "Cond_YSI Pro Plus", SC_YSI.Pro.Plus = "SC_YSI Pro Plus", pH_YSI.Pro.Plus = "pH_YSI Pro Plus", Salinity_YSI.Pro.Plus = "Salinity_YSI Pro Plus", DOpercent_YSI.Pro.Plus = "DO%_YSI Pro Plus", DO_YSI.Pro.Plus = "DO_YSI Pro Plus", DOpercent_YSI556 = "DO%_YSI556") # Rename column headers to remove symbols and spaces.
 
 sfanWQwide2_num <- select_if(sfanWQwide2, is.numeric) # New data frame that is a subset of numeric variables from sfanWQwide2.
 sfanWQwide2_num$Depth <- sfanWQwide2_num$LQL <- sfanWQwide2_num$UQL <- sfanWQwide2_num$rn <- NULL # Remove columns that are not WQ parameter variables.
 ```
 
 
-9 packages highlighted in "AutoEDA Packages in RStudio for EDA0" for having the most potential for the EDA0 of NPS I&M data: lubridate, dataMaid, explore, DataExplorer, SmartEDA, summarytools, inspectdf, funModeling, visdat.
+10 packages highlighted in "AutoEDA Packages in R for EDA0" for having the most potential for the EDA0 of NPS I&M data: lubridate, dataMaid, explore, DataExplorer, SmartEDA, summarytools, inspectdf, funModeling, visdat.
 
 
 lubridate:
@@ -195,7 +203,59 @@ vis_cor(sfanWQwide2_num) # Heatmap displaying correlations. Can specify what to 
 ```
 
 
-End of 9 packages detailed in "AutoEDA Packages in RStudio for EDA0" (Partlow, 2020)
+Rasters with ggplot2:
+```{r}
+# Packages needed: ggplot2, plyr. reshape2, data.table, RColorBrewer, gridExtra
+
+ggsfanWQwide2<-sfanWQwide2 # Make copy of sfanWQwide2.
+
+ggsfanWQwide2$DOpercent_YSI85.E <- ifelse(ggsfanWQwide2$DOpercent_YSI85 <= 50, 1, 0) # Add column with a value of 1 when DOpercent is less than 50
+
+# Create new dataset which collapses duplicated readings in one month by taking the means of the readings,creates columns denoting when there are exceedance values, and also creates stand along columns for Year and Month:
+ggsfanWQwide2$Date <- mdy(ggsfanWQwide2$Date) # Change data type from character to date.
+sitestats <- ddply(ggsfanWQwide2, c("StationID", "Date"), summarize, DOpercent_YSI85=mean(DOpercent_YSI85, na.rm=TRUE))
+e <- ddply(ggsfanWQwide2, c("StationID", "Date"), summarize, DOpercent_YSI85.E=sum(DOpercent_YSI85.E, na.rm=TRUE)) # Create a file that sums exccedances, so that any row NOT including any exceedances is represented with a 0, any rows containing any exceedances is represented by 1 or greater.
+sitestats$Y <- year(sitestats$Date)
+sitestats$M <- month(sitestats$Date)
+e$StationID <- NULL
+e$Date <- NULL
+sitestats <- cbind(sitestats, e)
+sitestats$DOpercent_YSI85.E <- ifelse(sitestats$DOpercent_YSI85.E>0, "*", NA) # In the column DOpercent_YSI85.E, change any value >0 to a * for printing on charts.
+
+
+xlabels <- c("O", "N", "D", "J", "F", "M", "A", "M", "J", "J", "A", "S") # Set names for plot x axis labels (months)
+
+siteDO <- as.data.table(sitestats) # Convert table sitestats into a data.table to enable the plots to call for specific sites.
+
+#Call plots:
+for (i in unique(ggsfanWQwide2$StationID)) { # Set up loop to cycle through all sites.
+   
+raster <- siteDO[StationID==i] # Create a variable that includes one site and all parameters.
+
+name=paste("StationID", as.character(raster$StationID[1])) # Define variable name as StationID name for plot title.
+
+p.DOpercent_YSI85 <- ggplot(raster, aes(M, Y)) + # Call a raster plot with x axis water months, y axis water years
+geom_tile(aes(fill=DOpercent_YSI85)) + # Fill raster plot with temperature data.
+geom_text(aes(label=DOpercent_YSI85.E)) + # Print number of exceedances in raster plot.
+scale_y_continuous(breaks=unique(sitestats$Y)) + # Name y axis ticks with years.
+scale_x_continuous(breaks=c(1:12), labels=xlabels) + # Name x axis ticks with months.
+labs(x="Month",y="Year") + # Label x and y axes
+ggtitle(paste0(name,"DOpercent_YSI85")) + # Label plot
+theme(plot.title=element_text(size=10)) + # Size plot title
+theme(panel.background = element_rect(fill='white', colour='grey')) + # Remove gray fill around plot.
+scale_fill_gradientn(colors = (brewer.pal(11,"RdYlBu")), limits=c(min(sitestats$DOpercent_YSI85, na.rm=TRUE),
+max(sitestats$DOpercent_YSI85, na.rm=TRUE))) # Set color gradient and min/max for fill pattern.
+
+print(p.DOpercent_YSI85)
+plotname <- paste(raster$StationID[1], "DOpercent_YSI85", "tiff", sep=".") # Create a file name for the plot.
+ggsave(plotname, plot = last_plot(), device = "tiff", width = 6.5, height = 5, units = "in") # Save plot to working directory as a tiff.
+
+}
+
+p <- grid.arrange(p.DOpercent_YSI85, ncol=4) # Draw four plots in a row
+```
+
+End of 10 packages detailed in "AutoEDA Packages in R for EDA0" (Partlow, 2020)
 ------------------------------------------------------------------------
 
 
